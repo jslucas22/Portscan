@@ -37,7 +37,7 @@ namespace Portscan.Services
                 return false;
             }
 
-            if (porta_inicial> porta_final )
+            if (porta_inicial > porta_final)
             {
                 MessageBox.Show("Porta inicial não pode ser maior do que a porta final! ", "Alerta", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
@@ -66,7 +66,7 @@ namespace Portscan.Services
         /// Retorna o estado das portas
         /// </summary>
         /// <param name="dataGridView">o componente visual</param>
-        public static async Task Escanear(DataGridView dataGridView)
+        public static async Task EscanearPortas(DataGridView dataGridView)
         {
             if (dataGridView.Rows.Count > 0) dataGridView.Rows.Clear();
             foreach (var porta in _portas)
@@ -94,7 +94,64 @@ namespace Portscan.Services
                     }
                 });
             }
+            dataGridView.ClearSelection();
+        }
+
+        /// <summary>
+        /// Retorna o estado das portas ativas
+        /// </summary>
+        /// <param name="dataGridView">o componente visual</param>
+        public static void EscanearPortasAtivas(DataGridView dataGridView)
+        {
+            if (dataGridView.Rows.Count > 0) dataGridView.Rows.Clear();
+            foreach (var porta in _portas)
+            {
+                try
+                {
+                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    socket.Connect(Ip, porta);
+
+                    if (socket.Connected)
+                    {
+                        dataGridView.Rows.Add();
+                        int row = dataGridView.Rows.Count - 1;
+
+                        dataGridView.Rows[row].Cells[(int)GridEnum.Porta].Value = porta;
+                        dataGridView.Rows[row].Cells[(int)GridEnum.Status].Value = Resources.green_circle_16px;
+                    }
+                }
+                catch {/*;;;*/ }
+            }
+            dataGridView.ClearSelection();
+        }
+
+        /// <summary>
+        /// Retorna o estado das portas inativas
+        /// </summary>
+        /// <param name="dataGridView">o componente visual</param>
+        public static void EscanearPortasInativas(DataGridView dataGridView)
+        {
+            if (dataGridView.Rows.Count > 0) dataGridView.Rows.Clear();
+            foreach (var porta in _portas)
+            {
+                try
+                {
+                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    socket.Connect(Ip, porta);
+                }
+                catch
+                {
+                    dataGridView.Rows.Add();
+                    int row = dataGridView.Rows.Count - 1;
+
+                    dataGridView.Rows[row].Cells[(int)GridEnum.Porta].Value = porta;
+                    dataGridView.Rows[row].Cells[(int)GridEnum.Status].Value = Resources.red_circle_16px;
+                }
+            }
+            dataGridView.ClearSelection();
         }
         #endregion
     }
 }
+
+

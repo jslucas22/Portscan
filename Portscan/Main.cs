@@ -38,7 +38,12 @@ namespace Portscan
         /// Faz o escaneamento das portas
         /// </summary>
         /// <returns></returns>
-        private async Task Escanear() => await Service.Escanear(dataGridView: dgvPortas);
+        private async Task Escanear()
+        {
+            if(rbAtivas.Checked) Service.EscanearPortasAtivas(dataGridView: dgvPortas); //# Tem que ser feito de forma assincrona
+            if (rbInativas.Checked) Service.EscanearPortasInativas(dataGridView: dgvPortas); //# Tem que ser feito de forma assincrona
+            if (rbTodas.Checked) await Service.EscanearPortas(dataGridView: dgvPortas);
+        }
         /// <summary>
         /// Executa os procedimentos iniciais
         /// </summary>        
